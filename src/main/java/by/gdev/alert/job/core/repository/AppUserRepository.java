@@ -1,0 +1,44 @@
+package by.gdev.alert.job.core.repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import by.gdev.alert.job.core.model.db.AppUser;
+import org.springframework.data.repository.query.Param;
+
+public interface AppUserRepository extends CrudRepository<AppUser, Long> {
+
+	Optional<AppUser> findByUuid(String uuid);
+
+	@Query("select u from AppUser u left join fetch u.orderModules where u.uuid = :uuid")
+	Optional<AppUser> findByUuidOneEagerModules(String uuid);
+
+	@Query("select u from AppUser u left join fetch u.userAlertTimes where u.uuid = :uuid")
+	Optional<AppUser> findByUuidOneEagerUserAlertTimes(String uuid);
+
+	@Query("select u from AppUser u left join fetch u.userAlertTimes left join fetch u.orderModules o left join fetch o.sources "
+			+ "where u.switchOffAlerts = true and o.available = true")
+	Set<AppUser> findAllUsersEagerOrderModules();
+
+	@Query("select u from AppUser u left join fetch u.userAlertTimes left join fetch u.delayOrderNotifications")
+	Set<AppUser> findAllOneEagerUserAlertTimes();
+
+    @Query("""
+    SELECT DISTINCT u
+    FROM AppUser u
+    JOIN OrderModules m ON m.user = u
+    JOIN m.sources s
+    WHERE s.id = :sourceSiteId
+""")
+    List<AppUser> findUsersBySourceSiteId(Long sourceSiteId);
+
+	@Query("SELECT u FROM AppUser u LEFT JOIN FETCH u.orderModules om LEFT JOIN FETCH om.sources WHERE u.uuid = :uuid")
+	Optional<AppUser> findByUuidWithModulesAndSources(@Param("uuid") String uuid);
+
+	@Query("SELECT COUNT(u) FROM AppUser u WHERE u.switchOffAlerts = true ")
+	long countBySwitchOffAlertsOn();
+}

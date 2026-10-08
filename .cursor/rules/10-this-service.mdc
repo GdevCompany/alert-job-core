@@ -1,0 +1,8 @@
+---
+description: Repositoriy alert-job-core
+alwaysApply: true
+---
+
+# alert-job-core
+
+Maven artifact `core-alert-job`. Main API: users, filters, orders. Calls other services by configured URLs (no Eureka).

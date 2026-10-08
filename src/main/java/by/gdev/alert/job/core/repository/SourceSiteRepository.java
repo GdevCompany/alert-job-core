@@ -1,0 +1,31 @@
+package by.gdev.alert.job.core.repository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+
+import by.gdev.alert.job.core.model.db.SourceSite;
+
+public interface SourceSiteRepository extends CrudRepository<SourceSite, Long> {
+
+    boolean existsBySiteCategoryAndActive(Long siteCategory, boolean active);
+
+    boolean existsBySiteCategoryAndSiteSubCategoryAndActive(Long siteCategory, Long siteSubCategory, boolean active);
+
+    @Query("select s from SourceSite s where s.siteSource = :siteSource and s.siteCategory = :siteCategory and s.siteSubCategory = :siteSubCategory")
+    Optional<SourceSite> findBySource(Long siteSource, Long siteCategory, Long siteSubCategory);
+
+    @Query("select s from SourceSite s where s.siteSource = :siteSource and s.siteCategory = :siteCategory and s.siteSubCategory is null")
+    Optional<SourceSite> findBySourceSubCategoryIsNull(Long siteSource, Long siteCategory);
+
+    List<SourceSite> findAllBySiteSource(Long siteSource);
+
+    List<SourceSite> findBySiteSourceAndSiteCategoryIn(Long siteSource, Set<Long> categoryIds);
+
+    List<SourceSite> findBySiteSourceAndSiteSubCategoryIn(Long siteSource, Set<Long> subcategoryIds);
+
+
+}
